@@ -1,4 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { NgForm } from '@angular/forms';
 import {Post} from '../post.model';
 
 @Component({
@@ -16,8 +17,11 @@ export class PostCreateComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  onAddPost(){
-    const post: Post={title:this.enteredTitle, content:this.enteredContent}
+  onAddPost(postForm: NgForm){
+    if(postForm.invalid){
+      return;
+    }
+    const post: Post={title:postForm.value.title, content:postForm.value.content}
     this.postCreated.emit(post);
     console.log(post);
   }
