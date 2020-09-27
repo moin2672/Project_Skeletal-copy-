@@ -7,6 +7,11 @@ import { Component, OnInit } from '@angular/core';
 })
 export class PostListComponent implements OnInit {
 
+  posts = [
+    {title:'First Post', content:'First Post content'},
+    {title:'Second Post', content:'Second Post content'},
+    {title:'Third Post', content:'Third Post content'}
+  ];
   constructor() { }
 
   ngOnInit(): void {
