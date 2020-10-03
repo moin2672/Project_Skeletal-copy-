@@ -45,4 +45,11 @@ export class PostsService {
     
   }
 
+  deletePost(postId:string){
+    this.httpClient.delete("http://localhost:3002/api/posts/"+postId)
+        .subscribe(()=>{
+          console.log("Deleted!");
+        });
+  }
+
 }
