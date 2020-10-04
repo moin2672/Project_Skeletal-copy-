@@ -13,7 +13,7 @@ export class PostCreateComponent implements OnInit {
   post:Post;
   enteredTitle="";
   enteredContent="";
-  private editMode = false;
+  editMode = false;
   private postId:string;
   
 
@@ -24,7 +24,13 @@ export class PostCreateComponent implements OnInit {
       if(paramMap.has('postId')){
         this.editMode=true;
         this.postId=paramMap.get('postId');
-        this.post=this.postsService.getPost(this.postId);
+        this.postsService.getPost(this.postId)
+            .subscribe(postData=>{
+              console.log(postData);
+              const transformedPostData: Post={id:postData._id, title:postData.title, content:postData.content}
+              this.post=transformedPostData;
+              console.log(this.post)
+            });
       } else {
         this.editMode=false;
         this.postId=null;
@@ -32,13 +38,16 @@ export class PostCreateComponent implements OnInit {
     });
   }
 
-  onAddPost(postForm: NgForm){
+  onSavePost(postForm: NgForm){
     if(postForm.invalid){
       return;
     }
-    const post: Post={id:null, title:postForm.value.title, content:postForm.value.content}
-    this.postsService.addPost(postForm.value.title, postForm.value.content);
-    console.log(post);
+ 
+    if(!this.editMode){
+      this.postsService.addPost(postForm.value.title, postForm.value.content);
+    } else {
+      this.postsService.updatePost(this.postId, postForm.value.title, postForm.value.content);
+    }
     postForm.resetForm();
   }
 

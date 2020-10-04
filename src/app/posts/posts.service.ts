@@ -14,7 +14,7 @@ export class PostsService {
   constructor(private httpClient: HttpClient) { }
 
   getPosts(){
-    this.httpClient.get<{message:string, posts:Post[]}>("http://localhost:3002/api/posts")
+    this.httpClient.get<{message:string, posts:any[]}>("http://localhost:3002/api/posts")
           .pipe(map((postData)=>{
             return postData.posts.map(post => {
               return {
@@ -33,7 +33,7 @@ export class PostsService {
   getPost(id:string){
     // console.log(id)
     // console.log(this.posts.find(p=>p.id===id))
-    return {...this.posts.find(p=>p.id===id)};
+    return this.httpClient.get<{_id:string, title: string, content: string}>("http://localhost:3002/api/posts/"+id);
   }
 
   getPostUpdateListener(){
@@ -51,6 +51,19 @@ export class PostsService {
             this.postsUpdated.next([...this.posts]);
           })
     
+  }
+
+  updatePost(id:string, title:string, content:string){
+    const post:Post={id:id, title:title, content:content}
+    this.httpClient.put("http://localhost:3002/api/posts/"+id, post)
+    .subscribe(response=>{
+      // console.log(response)
+      const updatedPosts = [...this.posts];
+      const oldPostIndex =  updatedPosts.findIndex(p => p.id === post.id);
+      updatedPosts[oldPostIndex] = post;
+      this.posts=updatedPosts;
+      this.postsUpdated.next([...this.posts]);
+    })
   }
 
   deletePost(postId:string){
