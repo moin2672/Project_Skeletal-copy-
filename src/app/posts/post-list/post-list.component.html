@@ -4,8 +4,8 @@
         <mat-expansion-panel-header>{{post.title}}</mat-expansion-panel-header>
         <p>{{post.content}}</p>
         <mat-action-row>
-            <button mat-stroked-button color="primary">EDIT</button>
-            <button mat-stroked-button color="warn" (click)="OnDelete(post.id)">DELETE</button>
+            <a mat-button color="primary" [routerLink]="['/edit', post.id]">EDIT</a>
+            <button mat-button color="warn" (click)="OnDelete(post.id)">DELETE</button>
         </mat-action-row>
     </mat-expansion-panel>
 </mat-accordion>

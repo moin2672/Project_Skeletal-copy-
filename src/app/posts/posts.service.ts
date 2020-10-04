@@ -30,6 +30,12 @@ export class PostsService {
           })
   }
 
+  getPost(id:string){
+    // console.log(id)
+    // console.log(this.posts.find(p=>p.id===id))
+    return {...this.posts.find(p=>p.id===id)};
+  }
+
   getPostUpdateListener(){
     return this.postsUpdated.asObservable();
   }
