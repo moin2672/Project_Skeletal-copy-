@@ -36,7 +36,7 @@ export class PostsService {
   getPost(id:string){
     // console.log(id)
     // console.log(this.posts.find(p=>p.id===id))
-    return this.httpClient.get<{_id:string, title: string, content: string}>("http://localhost:3002/api/posts/"+id);
+    return this.httpClient.get<{_id:string, title: string, content: string, imagePath:string}>("http://localhost:3002/api/posts/"+id);
   }
 
   getPostUpdateListener(){
@@ -65,13 +65,36 @@ export class PostsService {
     
   }
 
-  updatePost(id:string, title:string, content:string){
+  updatePost(id:string, title:string, content:string, image:File|string){
+    let postData:Post|FormData;
+    if(typeof(image) === 'object'){
+      postData=new FormData();
+      postData.append("id",id);
+      postData.append("title",title);
+      postData.append("content", content)
+      postData.append("image", image, title)
+    }else{
+      postData={
+        id:id,
+        title:title,
+        content:content,
+        imagePath:image
+      }
+
+    }
+
     const post:Post={id:id, title:title, content:content, imagePath: null}
-    this.httpClient.put("http://localhost:3002/api/posts/"+id, post)
+    this.httpClient.put("http://localhost:3002/api/posts/"+id, postData)
     .subscribe(response=>{
       // console.log(response)
       const updatedPosts = [...this.posts];
-      const oldPostIndex =  updatedPosts.findIndex(p => p.id === post.id);
+      const oldPostIndex =  updatedPosts.findIndex(p => p.id === id);
+      const post:Post={
+        id:id,
+        title:title,
+        content:content,
+        imagePath:""
+      }
       updatedPosts[oldPostIndex] = post;
       this.posts=updatedPosts;
       this.postsUpdated.next([...this.posts]);
