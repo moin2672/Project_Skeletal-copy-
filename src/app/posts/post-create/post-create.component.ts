@@ -1,5 +1,5 @@
 import { Component,  OnInit } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { EmailValidator, FormControl, FormGroup, RequiredValidator, Validators } from '@angular/forms';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import {Post} from '../post.model';
 import { PostsService } from '../posts.service';
@@ -15,12 +15,19 @@ export class PostCreateComponent implements OnInit {
   enteredContent="";
   editMode = false;
   isLoading=false;
+  form:FormGroup;
   private postId:string;
   
 
   constructor(private postsService: PostsService, public activatedRoute: ActivatedRoute) { }
 
   ngOnInit(): void {
+
+    this.form=new FormGroup({
+      title:new FormControl(null, {validators:[Validators.required, Validators.minLength(3)]}),
+      content:new FormControl(null, {validators:[Validators.required]})
+    })
+
     this.activatedRoute.paramMap.subscribe((paramMap: ParamMap)=>{
       if(paramMap.has('postId')){
         this.editMode=true;
@@ -30,8 +37,16 @@ export class PostCreateComponent implements OnInit {
             .subscribe(postData=>{
               this.isLoading=false;
               console.log(postData);
-              const transformedPostData: Post={id:postData._id, title:postData.title, content:postData.content}
+              const transformedPostData: Post={
+                                          id:postData._id, 
+                                          title:postData.title, 
+                                          content:postData.content
+                                        }
               this.post=transformedPostData;
+              this.form.setValue({
+                                  title:this.post.title, 
+                                  content:this.post.content
+                                })
               console.log(this.post)
             });
       } else {
@@ -41,17 +56,17 @@ export class PostCreateComponent implements OnInit {
     });
   }
 
-  onSavePost(postForm: NgForm){
-    if(postForm.invalid){
+  onSavePost(){
+    if(this.form.invalid){
       return;
     }
     this.isLoading=true;
     if(!this.editMode){
-      this.postsService.addPost(postForm.value.title, postForm.value.content);
+      this.postsService.addPost(this.form.value.title, this.form.value.content);
     } else {
-      this.postsService.updatePost(this.postId, postForm.value.title, postForm.value.content);
+      this.postsService.updatePost(this.postId, this.form.value.title, this.form.value.content);
     }
-    postForm.resetForm();
+    this.form.reset();
   }
 
 }
