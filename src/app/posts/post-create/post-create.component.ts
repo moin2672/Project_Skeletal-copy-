@@ -43,7 +43,8 @@ export class PostCreateComponent implements OnInit {
               const transformedPostData: Post={
                                           id:postData._id, 
                                           title:postData.title, 
-                                          content:postData.content
+                                          content:postData.content,
+                                          imagePath:null
                                         }
               this.post=transformedPostData;
               this.form.setValue({
