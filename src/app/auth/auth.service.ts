@@ -7,8 +7,14 @@ import { AuthData } from './auth-data.model';
 })
 export class AuthService {
 
+  private token;
+
   constructor(private httpClient:HttpClient) { 
 
+  }
+
+  getToken(){
+    return this.token;
   }
 
   createUser(email:string, password:string){
@@ -20,9 +26,11 @@ export class AuthService {
   }
   loginUser(email:string, password:string){
     const authData:AuthData={email:email, password:password}
-    this.httpClient.post("http://localhost:3002/api/users/login", authData)
+    this.httpClient.post<{token:string}>("http://localhost:3002/api/users/login", authData)
                     .subscribe(response=>{
-                      console.log(response);
+                      // console.log(response);
+                      const token = response.token;
+                      this.token=token;
                     });
   }
 }
