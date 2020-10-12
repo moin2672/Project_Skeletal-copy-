@@ -1,6 +1,8 @@
-import { Component,  OnInit } from '@angular/core';
-import { EmailValidator, FormControl, FormGroup, RequiredValidator, Validators } from '@angular/forms';
+import { Component,  OnDestroy,  OnInit } from '@angular/core';
+import {  FormControl, FormGroup,  Validators } from '@angular/forms';
 import { ActivatedRoute, ParamMap } from '@angular/router';
+import {Subscription} from 'rxjs';
+import { AuthService } from 'src/app/auth/auth.service';
 import {Post} from '../post.model';
 import { PostsService } from '../posts.service';
 import {mimeType} from './mime-type.validator';
@@ -10,7 +12,7 @@ import {mimeType} from './mime-type.validator';
   templateUrl: './post-create.component.html',
   styleUrls: ['./post-create.component.css']
 })
-export class PostCreateComponent implements OnInit {
+export class PostCreateComponent implements OnInit, OnDestroy {
   post:Post;
   enteredTitle="";
   enteredContent="";
@@ -19,11 +21,20 @@ export class PostCreateComponent implements OnInit {
   form:FormGroup;
   imagePreview:string;
   private postId:string;
+  private authStatusSub: Subscription;
   
 
-  constructor(private postsService: PostsService, public activatedRoute: ActivatedRoute) { }
+  constructor(private postsService: PostsService, 
+              public activatedRoute: ActivatedRoute,
+              private authService: AuthService) { }
 
   ngOnInit(): void {
+
+    this.authStatusSub=this.authService
+                          .getAuthStatusListener()
+                          .subscribe(authStatus=>{
+                            this.isLoading=false;
+                          });
 
     this.form=new FormGroup({
       title:new FormControl(null, {validators:[Validators.required, Validators.minLength(3)]}),
@@ -86,6 +97,10 @@ export class PostCreateComponent implements OnInit {
       this.postsService.updatePost(this.postId, this.form.value.title, this.form.value.content, this.form.value.image);
     }
     this.form.reset();
+  }
+
+  ngOnDestroy(){
+    this.authStatusSub.unsubscribe();
   }
 
 }
