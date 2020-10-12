@@ -50,7 +50,13 @@ export class PostsService {
   getPost(id:string){
     // console.log(id)
     // console.log(this.posts.find(p=>p.id===id))
-    return this.httpClient.get<{_id:string, title: string, content: string, imagePath:string}>("http://localhost:3002/api/posts/"+id);
+    return this.httpClient.get<{
+      _id:string;
+      title: string;
+      content: string;
+      imagePath:string;
+      creator:string;
+    }>("http://localhost:3002/api/posts/"+id);
   }
 
   getPostUpdateListener(){
@@ -83,12 +89,12 @@ export class PostsService {
         id:id,
         title:title,
         content:content,
-        imagePath:image
+        imagePath:image,
+        creator:null
       }
 
     }
-
-    const post:Post={id:id, title:title, content:content, imagePath: null}
+    // const post:Post={id:id, title:title, content:content, imagePath: null}
     this.httpClient.put("http://localhost:3002/api/posts/"+id, postData)
     .subscribe(response=>{
         this.router.navigate(['/']);
